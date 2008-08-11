@@ -61,7 +61,7 @@ class Admin::ChartsController < ApplicationController
 
   def revenue_history_months
     limit = 12
-    query_results = Order.connection.select_all(revenue_history_months_sql(limit))
+    query_results = revenue_history_months_results(limit)
 
     labels = []
     data = []
@@ -163,7 +163,7 @@ class Admin::ChartsController < ApplicationController
 
         order by last_time desc"
     else
-      # Assume mysql if it's not postgresql
+      # Assume mysql
       "select extract(year from orders.order_time) as year,
               extract(month from orders.order_time) as month,
               extract(day from orders.order_time) as day,
@@ -250,8 +250,28 @@ class Admin::ChartsController < ApplicationController
         group by year, month, months_ago
 
         order by last_time desc limit #{months}"
+    elsif Order.connection.adapter_name =~ /^sqlite/i
+      "select strftime('%Y', orders.order_time) as year,
+              strftime('%m', orders.order_time) as month,
+              cast(
+                (julianday('now') - julianday(orders.order_time))/30
+              as int) as months_ago,
+              sum(line_items.unit_price * quantity)
+                - sum(coalesce(coupons.amount, 0))
+                - sum(line_items.unit_price * quantity * coalesce(percentage, 0) / 100) as revenue,
+              datetime(max(julianday(orders.order_time))) as last_time
+
+         from orders
+              inner join line_items on orders.id = line_items.order_id
+              left outer join coupons on coupons.id = orders.coupon_id
+
+        where status = 'C' and lower(payment_type) != 'free'
+
+        group by year, month, months_ago
+
+        order by last_time desc limit #{months}"
     else
-      # Assume mysql if it's not postgresql
+      # Assume mysql
       "select extract(year from orders.order_time) as year,
               extract(month from orders.order_time) as month,
               month(datediff(now(), orders.order_time)) as months_ago,
@@ -270,5 +290,9 @@ class Admin::ChartsController < ApplicationController
 
         order by last_time desc limit #{months}"
     end
+  end
+  
+  def revenue_history_months_results(months)
+    return Order.connection.select_all(revenue_history_months_sql(months))
   end
 end

@@ -1,5 +1,6 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
-# Don't use DateTime.now... causes rounding errors
+
+# Make sure 'first' and 'taxed' are off by a minute
 first:
   coupon_id:
   status: "C"
@@ -26,7 +27,7 @@ taxed:
   coupon_id:
   status: "C"
   email: "test@test.com"
-  order_time: <%= 1.minute.ago.to_s :db %>
+  order_time: <%= 2.minute.ago.to_s :db %>
   first_name: "Princess"
   licensee_name: "Barf the Mog"
   last_name: "Vespa"

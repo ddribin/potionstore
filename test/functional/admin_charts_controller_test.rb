@@ -13,6 +13,10 @@ class Admin::ChartsController
   def test_revenue_history_weeks_results(weeks)
     return revenue_history_weeks_results(weeks)
   end
+  
+  def test_revenue_history_months_results(months)
+    return revenue_history_months_results(months)
+  end
 end
 
 class AdminChartsControllerTest < Test::Unit::TestCase
@@ -81,6 +85,20 @@ class AdminChartsControllerTest < Test::Unit::TestCase
   def test_revenue_history_weeks
     @request.session[:logged_in] = true
     get :revenue_history_weeks
+    assert_response :success
+  end
+
+  
+  def test_revenue_history_months_results
+    query_results = @controller.test_revenue_history_months_results(12)
+    # It's kinda hard to test the results due to fixture orders relative
+    # to first of the month.  Just make sure the results aren't empty
+    assert(query_results.length > 0)
+  end
+
+  def test_revenue_history_months
+    @request.session[:logged_in] = true
+    get :revenue_history_months
     assert_response :success
   end
 end
