@@ -35,6 +35,22 @@ module ActiveRecord
         end
     end
     
+    class SQLite3Adapter < SQLiteAdapter
+      def foreign_key_constraints(table, name = nil)
+        []
+      end
+      
+      def remove_foreign_key_constraint(table_name, constraint_name)
+      end
+      
+      # Fails with no menthod 'default_value' in rails2
+      # alias old_default_value default_value
+      def default_value(value)
+        return ":now" if value =~ /^now\(\)|^\('now'::text\)::(date|timestamp)/i
+        #return old_default_value(value) 
+      end
+    end
+    
     class PostgreSQLAdapter < AbstractAdapter
       def foreign_key_constraints(table, name = nil)
         sql =  "SELECT conname, pg_catalog.pg_get_constraintdef(oid) AS consrc FROM pg_catalog.pg_constraint WHERE contype='f' "
