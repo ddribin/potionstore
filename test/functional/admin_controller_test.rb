@@ -74,5 +74,10 @@ class AdminControllerTest < Test::Unit::TestCase
     revenue = assigns(:revenue)[3]
     assert_equal("5", num_orders)
     assert_equal(500, revenue)
+    
+    daily_avg = 400.0/90.0
+    assert_in_delta(daily_avg * 365, assigns(:year_estimate), 0.01)
+    # Don't bother testing month_estimate, as it uses the dame daily_avg
+    # value, which is really the important thing to test.
   end
 end

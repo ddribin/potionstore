@@ -166,15 +166,19 @@ class AdminController < ApplicationController
   private
   def revenue_summary
     # NOTE: We have to use SQL because performance is completely unacceptable otherwise
-
-    # helper function
-    def last_n_days_sql(days)
-      # NOTE: Older mysql should use IFNULL instead of COALESCE
+    
+    def date_expr(days)
       date_expr = "current_date - #{days-1} <= order_time"
       if Order.connection.adapter_name =~ /^sqlite/i
         date_expr = "julianday('now', '-#{days} day') <= julianday(order_time)"
       end
-      
+      return date_expr
+    end
+
+    # helper function
+    def last_n_days_sql(days)
+      # NOTE: Older mysql should use IFNULL instead of COALESCE
+      date_expr = date_expr(days)
       return "
         select (select count(*)
                   from orders
@@ -240,6 +244,7 @@ class AdminController < ApplicationController
     end
 
     def last_n_days_revenue(days)
+      date_expr = date_expr(days)
       last_n_days_sql = "
         select sum(line_items.unit_price * quantity)
                   - sum(coalesce(coupons.amount, 0))
@@ -249,7 +254,7 @@ class AdminController < ApplicationController
                inner join line_items on orders.id = line_items.order_id
                left outer join coupons on coupons.id = orders.coupon_id
 
-         where status = 'C' and lower(payment_type) != 'free' and current_date - #{days-1} <= order_time"
+         where status = 'C' and lower(payment_type) != 'free' and #{date_expr}"
       result = Order.connection.select_all(last_n_days_sql)
       return (result != nil && result.length > 0 && result[0]["revenue"] != nil) ? result[0]["revenue"] : 0
     end
