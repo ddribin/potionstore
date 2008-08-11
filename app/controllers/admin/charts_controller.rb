@@ -179,7 +179,7 @@ class Admin::ChartsController < ApplicationController
     end
   end
 
-  def revenue_history_days_sql_results(days)
+  def revenue_history_days_results(days)
     return Order.connection.select_all(revenue_history_days_sql(days))
   end
 

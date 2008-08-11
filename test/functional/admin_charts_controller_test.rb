@@ -6,8 +6,8 @@ class Admin::ChartsController; def rescue_action(e) raise e end; end
 
 # Expose private methods for testing
 class Admin::ChartsController
-  def test_revenue_history_days_sql_results(days)
-    return revenue_history_days_sql_results(days)
+  def test_revenue_history_days_results(days)
+    return revenue_history_days_results(days)
   end
 end
 
@@ -20,9 +20,9 @@ class AdminChartsControllerTest < Test::Unit::TestCase
     @response   = ActionController::TestResponse.new
   end
 
-  def test_revenue_history_days_sql_results
+  def test_revenue_history_days_results
     # 3 orders within last 30 days
-    query_results = @controller.test_revenue_history_days_sql_results(30)
+    query_results = @controller.test_revenue_history_days_results(30)
     assert_equal(4, query_results.length)
     
     # Match against order(:first)
@@ -56,5 +56,11 @@ class AdminChartsControllerTest < Test::Unit::TestCase
     assert_equal(order_time.strftime('%m'), result['month'])
     assert_equal(order_time.strftime('%d'), result['day'])
     assert_equal(15, result['days_ago'].to_i)
+  end
+  
+  def test_revenue_history_days_sql_results
+    @request.session[:logged_in] = true
+    get :revenue_history_days
+    assert_response :success
   end
 end
