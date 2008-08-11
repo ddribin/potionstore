@@ -4,12 +4,6 @@ require 'admin_controller'
 # Re-raise errors caught by the controller.
 class AdminController; def rescue_action(e) raise e end; end
 
-class AdminController
-  def test_revenue_summary()
-    return revenue_summary()
-  end
-end
-
 class AdminControllerTest < Test::Unit::TestCase
   fixtures :products, :orders, :line_items, :coupons
 
