@@ -9,6 +9,10 @@ class Admin::ChartsController
   def test_revenue_history_days_results(days)
     return revenue_history_days_results(days)
   end
+  
+  def test_revenue_history_weeks_results(weeks)
+    return revenue_history_weeks_results(weeks)
+  end
 end
 
 class AdminChartsControllerTest < Test::Unit::TestCase
@@ -21,7 +25,7 @@ class AdminChartsControllerTest < Test::Unit::TestCase
   end
 
   def test_revenue_history_days_results
-    # 3 orders within last 30 days
+    # 4 orders within last 30 days
     query_results = @controller.test_revenue_history_days_results(30)
     assert_equal(4, query_results.length)
     
@@ -58,9 +62,25 @@ class AdminChartsControllerTest < Test::Unit::TestCase
     assert_equal(15, result['days_ago'].to_i)
   end
   
-  def test_revenue_history_days_sql_results
+  def test_revenue_history_days
     @request.session[:logged_in] = true
     get :revenue_history_days
+    assert_response :success
+  end
+  
+  def test_revenue_history_weeks_results
+    query_results = @controller.test_revenue_history_weeks_results(26)
+    # 3 weeks within last 26 weeks have orders
+    assert_equal(3, query_results.length)
+    
+    # Two in the last week
+    result = query_results[0]
+    assert_equal("200", result['revenue'])
+  end
+
+  def test_revenue_history_weeks
+    @request.session[:logged_in] = true
+    get :revenue_history_weeks
     assert_response :success
   end
 end

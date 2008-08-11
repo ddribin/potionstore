@@ -31,7 +31,7 @@ class Admin::ChartsController < ApplicationController
 
   def revenue_history_weeks
     limit = 26
-    query_results = Order.connection.select_all(revenue_history_weeks_sql(limit))
+    query_results = revenue_history_weeks_results(limit)
 
     labels = []
     data = []
@@ -117,6 +117,11 @@ class Admin::ChartsController < ApplicationController
   end
 
   private
+  def sqlite_date_expr(days)
+      return "julianday('now', '-#{days} day') <= julianday(order_time)"
+  end
+  
+  
   def revenue_history_days_sql(days)
     if Order.connection.adapter_name == 'PostgreSQL'
       "select extract(year from orders.order_time) as year,
@@ -138,6 +143,7 @@ class Admin::ChartsController < ApplicationController
 
         order by last_time desc"
     elsif Order.connection.adapter_name =~ /^sqlite/i
+      date_expr = sqlite_date_expr(days)
       "select strftime('%Y', orders.order_time) as year,
               strftime('%m', orders.order_time) as month,
               strftime('%d', orders.order_time) as day,
@@ -151,7 +157,7 @@ class Admin::ChartsController < ApplicationController
               inner join line_items on orders.id = line_items.order_id
               left outer join coupons on coupons.id = orders.coupon_id
 
-        where status = 'C' and lower(payment_type) != 'free' and julianday('now', '-#{days} day') <= julianday(order_time)
+        where status = 'C' and lower(payment_type) != 'free' and #{date_expr}
 
         group by year, month, day, days_ago
 
@@ -184,8 +190,26 @@ class Admin::ChartsController < ApplicationController
   end
 
   def revenue_history_weeks_sql(weeks)
-    # This query stays the same for both DBMS
-    "select extract(week from orders.order_time) as week,
+    if Order.connection.adapter_name =~ /^sqlite/i
+      days = weeks*7
+      date_expr = sqlite_date_expr(days)
+      "select strftime('%W', orders.order_time) as week,
+            sum(line_items.unit_price * quantity)
+              - sum(coalesce(coupons.amount, 0))
+              - sum(line_items.unit_price * quantity * coalesce(percentage, 0) / 100) as revenue,
+            datetime(max(julianday(orders.order_time))) as last_time
+
+       from orders
+            inner join line_items on orders.id = line_items.order_id
+            left outer join coupons on coupons.id = orders.coupon_id
+
+      where status = 'C' and lower(payment_type) != 'free' and #{date_expr}
+
+      group by week
+
+      order by last_time desc limit #{weeks}"
+    else
+      "select extract(week from orders.order_time) as week,
             sum(line_items.unit_price * quantity)
               - sum(coalesce(coupons.amount, 0))
               - sum(line_items.unit_price * quantity * coalesce(percentage, 0) / 100) as revenue,
@@ -200,6 +224,11 @@ class Admin::ChartsController < ApplicationController
       group by week
 
       order by last_time desc limit #{weeks}"
+    end
+  end
+  
+  def revenue_history_weeks_results(weeks)
+    return Order.connection.select_all(revenue_history_weeks_sql(weeks))
   end
 
   def revenue_history_months_sql(months)
