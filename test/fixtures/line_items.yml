@@ -13,3 +13,23 @@ taxed:
   unit_price: 100
   license_key: "AB-0000000001"
 
+last_week:
+  order: last_week
+  product: first
+  quantity: 1
+  unit_price: 100
+  license_key: "AB-0000000001"
+
+last_month:
+  order: last_month
+  product: first
+  quantity: 1
+  unit_price: 100
+  license_key: "AB-0000000001"
+
+last_year:
+  order: last_year
+  product: first
+  quantity: 1
+  unit_price: 100
+  license_key: "AB-0000000001"

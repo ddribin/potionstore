@@ -4,8 +4,14 @@ require 'admin_controller'
 # Re-raise errors caught by the controller.
 class AdminController; def rescue_action(e) raise e end; end
 
+class AdminController
+  def test_revenue_summary()
+    return revenue_summary()
+  end
+end
+
 class AdminControllerTest < Test::Unit::TestCase
-  fixtures :products
+  fixtures :products, :orders, :line_items, :coupons
 
   def setup
     @controller = AdminController.new
@@ -37,5 +43,36 @@ class AdminControllerTest < Test::Unit::TestCase
     process 'generate_coupons', {}, { :logged_in => true }
     assert_response :success
     assert_template 'generate_coupons'
+  end
+  
+  def test_index_assigns
+    @request.session[:logged_in] = true
+    get :index
+    assert_equal(assigns(:num_orders).length, 4)
+    assert_equal(assigns(:revenue).length, 4)
+    
+    # Within 1 day
+    num_orders = assigns(:num_orders)[0]
+    revenue = assigns(:revenue)[0]
+    assert_equal("2", num_orders)
+    assert_equal(200, revenue)
+    
+    # With 7 days
+    num_orders = assigns(:num_orders)[1]
+    revenue = assigns(:revenue)[1]
+    assert_equal("3", num_orders)
+    assert_equal(300, revenue)
+    
+    # With 30 days
+    num_orders = assigns(:num_orders)[2]
+    revenue = assigns(:revenue)[2]
+    assert_equal("4", num_orders)
+    assert_equal(400, revenue)
+    
+    # With 365 days
+    num_orders = assigns(:num_orders)[3]
+    revenue = assigns(:revenue)[3]
+    assert_equal("5", num_orders)
+    assert_equal(500, revenue)
   end
 end

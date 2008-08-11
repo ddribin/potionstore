@@ -3,7 +3,7 @@ first:
   coupon_id:
   status: "C"
   email: "test@test.com"
-  order_time: "2007-07-01 12:00:00+08:00"
+  order_time: <%= DateTime.now %>
   first_name: "Princess"
   licensee_name: "Barf the Mog"
   last_name: "Vespa"
@@ -25,7 +25,7 @@ taxed:
   coupon_id:
   status: "C"
   email: "test@test.com"
-  order_time: "2007-07-01 12:00:00+08:00"
+  order_time: <%= DateTime.now %>
   first_name: "Princess"
   licensee_name: "Barf the Mog"
   last_name: "Vespa"
@@ -42,3 +42,69 @@ taxed:
   failure_code: 0
   failure_reason: ""
   transaction_number: "012124AAAAJDHHDGUTQWQOOA1"
+
+last_week:
+  coupon_id:
+  status: "C"
+  email: "test@test.com"
+  order_time: <%= 5.days.ago.to_s :db %>
+  first_name: "Princess"
+  licensee_name: "Barf the Mog"
+  last_name: "Vespa"
+  company: "Druid Royal Family"
+  address1: "c/o Dot Matrix"
+  address2: "1 Royal Palace"
+  city: "Druidia City"
+  state: "CA"
+  zipcode: "90035"
+  country:  "US"
+  payment_type: "Visa"
+  ccnum: "XXXXXXXXXXXXXXXX3456"
+  comment: "Don't call"
+  failure_code: 0
+  failure_reason: ""
+  transaction_number: "012125AAAAJDHHDGUTQWQOOA1"
+
+last_month:
+  coupon_id:
+  status: "C"
+  email: "test@test.com"
+  order_time: <%= 15.days.ago.to_s :db %>
+  first_name: "Princess"
+  licensee_name: "Barf the Mog"
+  last_name: "Vespa"
+  company: "Druid Royal Family"
+  address1: "c/o Dot Matrix"
+  address2: "1 Royal Palace"
+  city: "Druidia City"
+  state: "CA"
+  zipcode: "90035"
+  country:  "US"
+  payment_type: "Visa"
+  ccnum: "XXXXXXXXXXXXXXXX3456"
+  comment: "Don't call"
+  failure_code: 0
+  failure_reason: ""
+  transaction_number: "012125AAAAJDHHDGUTQWQOOA1"
+
+last_year:
+  coupon_id:
+  status: "C"
+  email: "test@test.com"
+  order_time: <%= 350.days.ago.to_s :db %>
+  first_name: "Princess"
+  licensee_name: "Barf the Mog"
+  last_name: "Vespa"
+  company: "Druid Royal Family"
+  address1: "c/o Dot Matrix"
+  address2: "1 Royal Palace"
+  city: "Druidia City"
+  state: "CA"
+  zipcode: "90035"
+  country:  "US"
+  payment_type: "Visa"
+  ccnum: "XXXXXXXXXXXXXXXX3456"
+  comment: "Don't call"
+  failure_code: 0
+  failure_reason: ""
+  transaction_number: "012125AAAAJDHHDGUTQWQOOA1"

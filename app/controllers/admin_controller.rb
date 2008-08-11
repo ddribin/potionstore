@@ -170,12 +170,17 @@ class AdminController < ApplicationController
     # helper function
     def last_n_days_sql(days)
       # NOTE: Older mysql should use IFNULL instead of COALESCE
+      date_expr = "current_date - #{days-1} <= order_time"
+      if Order.connection.adapter_name =~ /^sqlite/i
+        date_expr = "julianday('now', '-#{days} day') <= julianday(order_time)"
+      end
+      
       return "
         select (select count(*)
                   from orders
                  where status = 'C' and
                        lower(payment_type) != 'free' and
-                       current_date - #{days-1} <= order_time) as orders,
+                       #{date_expr}) as orders,
                sum(line_items.unit_price * quantity)
                  - sum(coalesce(coupons.amount, 0))
                  - sum(line_items.unit_price * quantity * coalesce(percentage, 0) / 100) as revenue,
@@ -187,7 +192,7 @@ class AdminController < ApplicationController
              left outer join products on products.id = line_items.product_id
              left outer join coupons on coupons.id = orders.coupon_id
 
-        where status = 'C' and lower(payment_type) != 'free' and current_date - #{days-1} <= order_time
+        where status = 'C' and lower(payment_type) != 'free' and #{date_expr}
 
         group by product_name"
     end
