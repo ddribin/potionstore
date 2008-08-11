@@ -4,7 +4,7 @@ class Admin::ChartsController < ApplicationController
 
   def revenue_history_days
     limit = 30
-    query_results = Order.connection.select_all(revenue_history_days_sql(limit))
+    query_results = revenue_history_days_results(limit)
 
     labels = []
     data = []
@@ -137,6 +137,25 @@ class Admin::ChartsController < ApplicationController
         group by year, month, day, days_ago
 
         order by last_time desc"
+    elsif Order.connection.adapter_name =~ /^sqlite/i
+      "select strftime('%Y', orders.order_time) as year,
+              strftime('%m', orders.order_time) as month,
+              strftime('%d', orders.order_time) as day,
+              julianday('now') - julianday(orders.order_time) as days_ago,
+              sum(line_items.unit_price * quantity)
+                - sum(coalesce(coupons.amount, 0))
+                - sum(line_items.unit_price * quantity * coalesce(percentage, 0) / 100) as revenue,
+              max(orders.order_time) as last_time
+
+         from orders
+              inner join line_items on orders.id = line_items.order_id
+              left outer join coupons on coupons.id = orders.coupon_id
+
+        where status = 'C' and lower(payment_type) != 'free' and julianday('now', '-#{days} day') <= julianday(order_time)
+
+        group by year, month, day, days_ago
+
+        order by last_time desc"
     else
       # Assume mysql if it's not postgresql
       "select extract(year from orders.order_time) as year,
@@ -158,6 +177,10 @@ class Admin::ChartsController < ApplicationController
 
         order by last_time desc"
     end
+  end
+
+  def revenue_history_days_sql_results(days)
+    return Order.connection.select_all(revenue_history_days_sql(days))
   end
 
   def revenue_history_weeks_sql(weeks)
