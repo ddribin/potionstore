@@ -1,6 +1,7 @@
 # Postgres and MySQL by bubbleware.com
 # Oracle and cleanups by atmos.org
 require 'digest/sha1'
+require 'active_record/connection_adapters/sqlite3_adapter'
 
 module ActiveRecord
   class SchemaDumper
