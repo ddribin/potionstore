@@ -2,3 +2,5 @@ db/schema.rb
 db/*.sqlite3
 log
 tmp
+# Used by zsh tab completion
+.rake_tasks
