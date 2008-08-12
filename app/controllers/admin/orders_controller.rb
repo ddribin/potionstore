@@ -110,7 +110,9 @@ class Admin::OrdersController < ApplicationController
   def cancel
     @order = Order.find(params[:id])
     @order.status = 'X'
-    @order.save
+    if not @order.save
+      logger.warn @order.errors.each_full {|msg| p msg}
+    end
     redirect_to :action => 'show', :id => @order.id
   end
 
