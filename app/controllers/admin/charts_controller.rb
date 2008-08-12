@@ -147,7 +147,9 @@ class Admin::ChartsController < ApplicationController
       "select strftime('%Y', orders.order_time) as year,
               strftime('%m', orders.order_time) as month,
               strftime('%d', orders.order_time) as day,
-              julianday('now') - julianday(orders.order_time) as days_ago,
+              cast (
+                julianday('now', 'start of day') - julianday(orders.order_time, 'start of day')
+              as int) as days_ago,
               sum(line_items.unit_price * quantity)
                 - sum(coalesce(coupons.amount, 0))
                 - sum(line_items.unit_price * quantity * coalesce(percentage, 0) / 100) as revenue,
@@ -254,7 +256,7 @@ class Admin::ChartsController < ApplicationController
       "select strftime('%Y', orders.order_time) as year,
               strftime('%m', orders.order_time) as month,
               cast(
-                (julianday('now') - julianday(orders.order_time))/30
+                (julianday('now', 'start of month') - julianday(orders.order_time, 'start of month'))/30
               as int) as months_ago,
               sum(line_items.unit_price * quantity)
                 - sum(coalesce(coupons.amount, 0))
@@ -266,6 +268,7 @@ class Admin::ChartsController < ApplicationController
               left outer join coupons on coupons.id = orders.coupon_id
 
         where status = 'C' and lower(payment_type) != 'free'
+          and julianday('now', '-#{months} months') <= julianday(order_time)
 
         group by year, month, months_ago
 
