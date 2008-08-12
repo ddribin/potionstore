@@ -29,41 +29,36 @@ class AdminChartsControllerTest < Test::Unit::TestCase
   end
 
   def test_revenue_history_days_results
-    # 4 orders within last 30 days
+    # 3 days with orders within last 30 days
     query_results = @controller.test_revenue_history_days_results(30)
-    assert_equal(4, query_results.length)
+    assert_equal(3, query_results.length)
     
-    # Match against order(:first)
+    # First result is for :first and :taxed (they are on the same day)
     result = query_results[0]
     order_time  = orders(:first).order_time
     assert_equal(order_time.strftime('%Y'), result['year'])
     assert_equal(order_time.strftime('%m'), result['month'])
     assert_equal(order_time.strftime('%d'), result['day'])
     assert_equal(0, result['days_ago'].to_i)
+    assert_equal("200", result['revenue'])
     
-    # Match against order(:taxed)
+    # Next match contains order(:last_week)
     result = query_results[1]
-    order_time  = orders(:taxed).order_time
-    assert_equal(order_time.strftime('%Y'), result['year'])
-    assert_equal(order_time.strftime('%m'), result['month'])
-    assert_equal(order_time.strftime('%d'), result['day'])
-    assert_equal(0, result['days_ago'].to_i)
-    
-    # Match against order(:last_week)
-    result = query_results[2]
     order_time  = orders(:last_week).order_time
     assert_equal(order_time.strftime('%Y'), result['year'])
     assert_equal(order_time.strftime('%m'), result['month'])
     assert_equal(order_time.strftime('%d'), result['day'])
     assert_equal(5, result['days_ago'].to_i)
+    assert_equal("100", result['revenue'])
     
     # Match against order(:last_month)
-    result = query_results[3]
+    result = query_results[2]
     order_time  = orders(:last_month).order_time
     assert_equal(order_time.strftime('%Y'), result['year'])
     assert_equal(order_time.strftime('%m'), result['month'])
     assert_equal(order_time.strftime('%d'), result['day'])
     assert_equal(15, result['days_ago'].to_i)
+    assert_equal("100", result['revenue'])
   end
   
   def test_revenue_history_days
