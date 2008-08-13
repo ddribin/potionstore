@@ -4,3 +4,4 @@ log
 tmp
 # Used by zsh tab completion
 .rake_tasks
+.DS_Store
