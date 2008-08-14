@@ -170,7 +170,7 @@ class AdminController < ApplicationController
     def date_expr(days)
       date_expr = "current_date - #{days-1} <= order_time"
       if Order.connection.adapter_name =~ /^sqlite/i
-        date_expr = "julianday('now', '-#{days} day') <= julianday(order_time)"
+        date_expr = "julianday('now', '-#{days-1} day', 'start of day') <= julianday(order_time, 'start of day')"
       end
       return date_expr
     end
