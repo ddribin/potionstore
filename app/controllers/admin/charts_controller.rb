@@ -118,7 +118,7 @@ class Admin::ChartsController < ApplicationController
 
   private
   def sqlite_date_expr(days)
-      return "julianday('now', '-#{days} day') <= julianday(order_time)"
+      return "julianday('now', '-#{days-1} day') <= julianday(order_time)"
   end
   
   
