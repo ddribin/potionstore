@@ -1,5 +1,6 @@
-# Potion Store requires postgresql for now
-
+#--------------------------------------------------------------------------------
+# PostgreSQL
+#--------------------------------------------------------------------------------
 development:
   adapter: sqlite3
   database: db/development.sqlite3
@@ -9,6 +10,14 @@ development-x:
   database: store_development
   encoding: utf8
   username: postgres
+  password:
+  host: localhost
+
+production:
+  adapter: postgresql
+  database: store_production
+  encoding: utf8
+  username: store
   password:
   host: localhost
 
@@ -27,10 +36,30 @@ test-x:
   password:
   host: localhost
 
-production:
-  adapter: postgresql
-  database: store_production
-  encoding: utf8
-  username: store
-  password:
-  host: localhost
+
+#--------------------------------------------------------------------------------
+# MySQL
+#--------------------------------------------------------------------------------
+# development:
+#   adapter: mysql
+#   database: store_development
+#   encoding: utf8
+#   username: root
+#   password:
+#   socket: /tmp/mysql.sock
+
+# production:
+#   adapter: mysql
+#   database: store_production
+#   encoding: utf8
+#   username: root
+#   password:
+#   socket: /tmp/mysql.sock
+
+# test:
+#   adapter: mysql
+#   database: store_test
+#   encoding: utf8
+#   username: root
+#   password:
+#   socket: /tmp/mysql.sock
