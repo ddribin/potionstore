@@ -140,6 +140,7 @@ class Order < ActiveRecord::Base
   end
 
   def licensee_name=(new_name)
+    new_name = new_name.gsub(/[ \r\n\t]+/, ' ').strip
     regenerate_keys = (self.licensee_name != new_name)
     write_attribute(:licensee_name, new_name)
     if regenerate_keys
