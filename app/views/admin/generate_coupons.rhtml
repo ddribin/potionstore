@@ -9,13 +9,18 @@
 	</tr>
 
 	<tr>
-		<td>Promotion Code:</td>
+		<td>Coupon Name:</td>
 		<td><%= text_field 'form', 'code' %></td>
 	</tr>
 
 	<tr>
 		<td>Description for Customer:</td>
 		<td><%= text_field 'form', 'description' %></td>
+	</tr>
+
+	<tr>
+		<td>Coupon:</td>
+		<td><%= text_field 'form', 'coupon' %></td>
 	</tr>
 
 	<tr>
@@ -36,6 +41,11 @@
 	<tr>
 		<td>Use Limit:</td>
 		<td><%= text_field 'form', 'use_limit', :value => '1' %></td>
+	</tr>
+
+	<tr>
+		<td>Number of valid days:</td>
+		<td><%= text_field 'form', 'numdays' %></td>
 	</tr>
 
 	<tr>
