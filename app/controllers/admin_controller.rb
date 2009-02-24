@@ -88,7 +88,7 @@ class AdminController < ApplicationController
         coupon = Coupon.new
         coupon.code = form[:code]
         coupon.product_code = form[:product_code]
-        coupon.coupon = form[:coupon]
+        coupon.coupon = form[:coupon] if !form[:coupon].blank?
         coupon.description = form[:description]
         coupon.amount = form[:amount]
         coupon.use_limit = form[:use_limit]
